@@ -1,6 +1,5 @@
 ﻿@model Lab5Cuong.Models.Movie
 
-
 @{
     ViewData["Title"] = "Create";
 }
@@ -50,17 +49,16 @@
                     }
                 </div>
             </div>
-           @*  <div class="form-group">
+
+            <div class="form-group">
                 <label asp-for="Members" class="control-label"></label>
                 <div class="members">
                     <div class="row">
                         <div class="col-md-4">
                             @{
                                 List<Person> people = ViewBag.People;
-                                var options = new SelectList(people, nameof(Person.Id), nameof(Person.FirstName), nameof(Person.LastName));
-
-                                var roles = Html.GetEnumSelectList<>();
-                                var roleOptions = new SelectList(roles, nameof(SelectListItem.Value), nameof(SelectListItem.Text));
+                                var options = new SelectList(people, nameof(Person.Id), nameof(Person.FirstName)); 
+                                var roles = Html.GetEnumSelectList<Lab5Cuong.Models.Role>(); 
                             }
                             <select asp-for="Members[0].PersonId" asp-items="options" class="form-control">
                                 <option value="">Select a person</option>
@@ -68,10 +66,10 @@
                             <span asp-validation-for="Members[0].PersonId" class="text-danger"></span>
                         </div>
                         <div class="col-md-4">
-                            <select asp-for="Members[0].Role" asp-items="roleOptions" class="form-control">
+                            <select asp-for="Members[0].MovieRole" asp-items="roles" class="form-control">
                                 <option value="">Select a role</option>
                             </select>
-                            <span asp-validation-for="Members[0].Role" class="text-danger"></span>
+                            <span asp-validation-for="Members[0].MovieRole" class="text-danger"></span>
                         </div>
                         <div class="col-md-4">
                             <button class="add-button" type="button">Add</button>
@@ -80,7 +78,7 @@
                     </div>
                 </div>
             </div>
- *@
+
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
@@ -96,4 +94,43 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script>
+        $(function () {
+            $(".members").on("click", ".add-button", function () {
+                var count = $(".members .row").length;
+                var row = $(this).closest(".row").clone(true);
+
+     
+                row.find('input, select').val('');
+
+                $(".members").append(row);
+                updateMemberIndex();
+                var form = $("form");
+                $("form").removeData("validator")
+                    .removeData("unobtrusiveValidation"); // Added by jQuery Unobtrusive Validation
+                $.validator.unobtrusive.parse(form);
+            });
+
+            $(".members").on("click", ".remove-button", function () {
+                if ($(".members .row").length > 1) {
+                    var row = $(this).closest(".row");
+                    row.remove();
+                    updateMemberIndex();
+                }
+            });
+        });
+
+        function updateMemberIndex() {
+            var members = $(".members .row");
+            members.each(function (index) {
+                var row = $(this);
+                row.find("select").eq(0).attr("name", `Members[${index}].PersonId`)
+                    .attr("id", `Members_${index}__PersonId`);
+                row.find("select").eq(1).attr("name", `Members[${index}].MovieRole`)
+                    .attr("id", `Members_${index}__MovieRole`);
+                row.find("span").eq(0).attr("data-valmsg-for", `Members[${index}].PersonId`);
+                row.find("span").eq(1).attr("data-valmsg-for", `Members[${index}].MovieRole`);
+            });
+        }
+    </script>
 }

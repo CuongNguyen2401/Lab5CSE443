@@ -4,6 +4,7 @@ using Lab5Cuong.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Lab5Cuong.Migrations
 {
     [DbContext(typeof(Lab5CuongContext))]
-    partial class Lab5CuongContextModelSnapshot : ModelSnapshot
+    [Migration("20240530074213_fix3KeyMember")]
+    partial class fix3KeyMember
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

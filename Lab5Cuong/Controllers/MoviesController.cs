@@ -21,6 +21,7 @@ namespace Lab5Cuong.Controllers
         // GET: Movies
         public async Task<IActionResult> Index()
         {
+
             return View(await _context.Movie.ToListAsync());
         }
 
@@ -49,6 +50,8 @@ namespace Lab5Cuong.Controllers
         public IActionResult Create()
         {
             ViewBag.Genres = GetGenres();
+            var people = _context.Persons.ToList();
+            ViewBag.People = people;
             return View();
         }
 
@@ -57,27 +60,57 @@ namespace Lab5Cuong.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Title,ReleaseDate,Price,Rating,ProducerId")] Movie movie, int[] selectedGenres)
+        public async Task<IActionResult> Create([Bind("Title,ReleaseDate,Price,Rating,ProducerId,Members")] Movie movie, int[] selectedGenres)
         {
             if (ModelState.IsValid)
             {
+                // Initialize the Genres list if it's null
                 if (movie.Genres == null)
                 {
                     movie.Genres = new List<Genre>();
                 }
-                _context.Genres.Where(g => selectedGenres.Contains(g.Id)).ToList().ForEach(g => movie.Genres.Add(g));
-                movie.Members = movie.Members.DistinctBy(x => new { x.Role, x.PersonId }).ToList();
-                _context.Add(movie);
 
+                // Add selected genres to the movie
+                var genres = _context.Genres.Where(g => selectedGenres.Contains(g.Id)).ToList();
+                foreach (var genre in genres)
+                {
+                    movie.Genres.Add(genre);
+                }
+
+                // Ensure no duplicate members
+                movie.Members = movie.Members.DistinctBy(x => new { x.MovieRole, x.PersonId }).ToList();
+
+                foreach (var member in movie.Members)
+                {
+                    var existingMember = await _context.Members
+                        .FirstOrDefaultAsync(m => m.PersonId == member.PersonId && m.MovieId == movie.Id);
+
+                    if (existingMember == null)
+                    {
+                        _context.Entry(member).State = EntityState.Added;
+                    }
+                    else
+                    {
+                        existingMember.MovieRole = member.MovieRole;
+                        _context.Entry(existingMember).State = EntityState.Modified;
+                    }
+                }
+
+                _context.Movie.Add(movie);
 
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ProducerId"] = new SelectList(_context.Set<Company>(), nameof(Company.Id),nameof(Company.Name), movie.ProducerId);
+
+            // Repopulate ViewData in case of error
+            ViewData["ProducerId"] = new SelectList(_context.Set<Company>(), nameof(Company.Id), nameof(Company.Name), movie.ProducerId);
             ViewData["People"] = await _context.Persons.ToListAsync();
             ViewBag.Genres = GetGenres();
+
             return View(movie);
         }
+
+
 
 
         private List<Genre> GetGenres()
@@ -95,6 +128,8 @@ namespace Lab5Cuong.Controllers
 
             var movie = await _context.Movie
                 .Include(m => m.Genres)
+                .Include(m => m.Members)
+                .ThenInclude(mm => mm.Person)  
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (movie == null)
@@ -102,11 +137,24 @@ namespace Lab5Cuong.Controllers
                 return NotFound();
             }
 
-            ViewBag.Genres = await _context.Genres.ToListAsync();
+            var genres = await _context.Genres.ToListAsync();
+            var members = await _context.Members.ToListAsync();
+            ViewBag.People = await _context.Persons.ToListAsync();
+            if (genres == null || members == null)
+            {
+                return NotFound(); // Or handle it accordingly if null
+            }
+
+            ViewBag.Genres = genres;
             ViewBag.SelectedGenres = movie.Genres.Select(g => g.Id).ToList();
+
+            ViewBag.Members = members;
+            ViewBag.SelectedMembers = movie.Members.Select(m => m.PersonId).ToList();
 
             return View(movie);
         }
+
+
 
 
         // POST: Movies/Edit/5
@@ -114,7 +162,7 @@ namespace Lab5Cuong.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,ReleaseDate,Price,Rating,ProducerId")] Movie movie)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,ReleaseDate,Price,Rating,ProducerId,Members")] Movie movie, int[] selectedGenres)
         {
             if (id != movie.Id)
             {
@@ -123,13 +171,11 @@ namespace Lab5Cuong.Controllers
 
             if (ModelState.IsValid)
             {
-                var selectedGenres = Request.Form["selectedGenres"].Select(g => int.Parse(g)).ToList();
-
                 try
                 {
-                    // Retrieve the existing movie from the database including its genres
                     var movieToUpdate = await _context.Movie
                         .Include(m => m.Genres)
+                        .Include(m => m.Members)
                         .FirstOrDefaultAsync(m => m.Id == id);
 
                     if (movieToUpdate == null)
@@ -137,24 +183,49 @@ namespace Lab5Cuong.Controllers
                         return NotFound();
                     }
 
-                    // Update scalar properties
+                    // Update basic movie details
                     movieToUpdate.Title = movie.Title;
                     movieToUpdate.ReleaseDate = movie.ReleaseDate;
                     movieToUpdate.Price = movie.Price;
                     movieToUpdate.Rating = movie.Rating;
                     movieToUpdate.ProducerId = movie.ProducerId;
 
-                    // Clear the existing genres
+                    // Update genres
                     movieToUpdate.Genres.Clear();
-
-                    // Add the new selected genres
                     var newGenres = await _context.Genres.Where(g => selectedGenres.Contains(g.Id)).ToListAsync();
                     foreach (var genre in newGenres)
                     {
                         movieToUpdate.Genres.Add(genre);
                     }
 
-                    // Update the movie entity
+                    // ...
+
+                    var updatedMembers = movie.Members
+    .Where(m => m != null)
+    .GroupBy(x => new { x.MovieRole, x.PersonId, x.MovieId })
+    .Select(g => g.First())
+    .ToList();
+
+                    // Remove old members
+                    var existingMemberIds = movieToUpdate.Members.Select(m => m.PersonId).ToList();
+                    movieToUpdate.Members.RemoveAll(m => !updatedMembers.Select(mm => mm.PersonId).Contains(m.PersonId));
+
+                    foreach (var member in movie.Members)
+                    {
+                        var existingMember = await _context.Members
+                            .FirstOrDefaultAsync(m => m.PersonId == member.PersonId && m.MovieId == movie.Id);
+
+                        if (existingMember == null)
+                        {
+                            _context.Entry(member).State = EntityState.Added;
+                        }
+                        else
+                        {
+                            existingMember.MovieRole = member.MovieRole;
+                            _context.Entry(existingMember).State = EntityState.Modified;
+                        }
+                    }
+
                     _context.Update(movieToUpdate);
                     await _context.SaveChangesAsync();
                 }
@@ -173,6 +244,8 @@ namespace Lab5Cuong.Controllers
             }
             return View(movie);
         }
+
+
 
 
 

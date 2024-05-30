@@ -22,7 +22,38 @@ namespace Lab5Cuong.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<Member>().HasKey(sc => new { sc.PersonId, sc.MovieId, sc.Role });
+            modelBuilder.Entity<Member>()
+.Property(m => m.MovieRole)
+.HasConversion<string>();
+
+            modelBuilder.Entity<Member>().HasKey(sc => new { sc.PersonId, sc.MovieId,sc.MovieRole});
+
+
+
+            // Seed person data
+            modelBuilder.Entity<Person>().HasData(
+                new Person
+                {
+                    Id = 1,
+                    FirstName = "John",
+                    LastName = "Doe",
+                    Dob = new DateTime(1990, 1, 1)
+                },
+                new Person
+                {
+                    Id = 2,
+                    FirstName = "Jane",
+                    LastName = "Smith",
+                    Dob = new DateTime(1995, 5, 20)
+                },
+                new Person
+                {
+                    Id = 3,
+                    FirstName = "Alice",
+                    LastName = "Johnson",
+                    Dob = new DateTime(1985, 3, 15)
+                }
+            );
 
             // Seed movie data
             modelBuilder.Entity<Movie>().HasData(

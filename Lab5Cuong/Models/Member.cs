@@ -13,7 +13,7 @@ namespace Lab5Cuong.Models
         public int MovieId { get; set; }
         public Movie Movie { get; set; }
 
-        public Role Role { get; set; }
+        public Role MovieRole { get; set; }
 
         
     }

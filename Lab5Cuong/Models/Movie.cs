@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Lab5Cuong.Models
 {
@@ -18,14 +19,10 @@ namespace Lab5Cuong.Models
         public double Rating { get; set; }
         public int ProducerId { get; set; }
         public ICollection<Genre> Genres { get; set; }
-        public MovieRole Role { get; set; } 
-        public ICollection<Member> Members { get; set; }
-        public enum MovieRole
-        {
-            Actor,
-            Director,
-            Producer
-        }
+ 
+
+        public List<Member> Members { get; set; }
+      
        
     }
 }

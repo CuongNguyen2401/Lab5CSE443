@@ -9,7 +9,7 @@ namespace Lab5Cuong.Models
         public string LastName { get; set; }
         [DataType(DataType.Date)]
         public DateTime Dob { get; set; }
-        public ICollection<Member> Members { get; set; }
+        public List<Member> Members { get; set; }
 
     }
 }

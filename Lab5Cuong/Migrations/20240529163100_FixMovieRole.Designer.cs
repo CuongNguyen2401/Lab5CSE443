@@ -4,6 +4,7 @@ using Lab5Cuong.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Lab5Cuong.Migrations
 {
     [DbContext(typeof(Lab5CuongContext))]
-    partial class Lab5CuongContextModelSnapshot : ModelSnapshot
+    [Migration("20240529163100_FixMovieRole")]
+    partial class FixMovieRole
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -175,29 +178,6 @@ namespace Lab5Cuong.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Persons");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Dob = new DateTime(1990, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            FirstName = "John",
-                            LastName = "Doe"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Dob = new DateTime(1995, 5, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            FirstName = "Jane",
-                            LastName = "Smith"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Dob = new DateTime(1985, 3, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            FirstName = "Alice",
-                            LastName = "Johnson"
-                        });
                 });
 
             modelBuilder.Entity("GenreMovie", b =>
