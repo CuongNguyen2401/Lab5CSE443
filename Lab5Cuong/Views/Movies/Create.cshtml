@@ -107,7 +107,7 @@
                 updateMemberIndex();
                 var form = $("form");
                 $("form").removeData("validator")
-                    .removeData("unobtrusiveValidation"); // Added by jQuery Unobtrusive Validation
+                    .removeData("unobtrusiveValidation"); 
                 $.validator.unobtrusive.parse(form);
             });
 

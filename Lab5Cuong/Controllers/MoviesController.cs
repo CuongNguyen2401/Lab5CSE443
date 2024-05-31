@@ -77,7 +77,7 @@ namespace Lab5Cuong.Controllers
                     movie.Genres.Add(genre);
                 }
 
-                // Ensure no duplicate members
+              
                 movie.Members = movie.Members.DistinctBy(x => new { x.MovieRole, x.PersonId }).ToList();
 
                 foreach (var member in movie.Members)
@@ -190,7 +190,7 @@ namespace Lab5Cuong.Controllers
                     movieToUpdate.Rating = movie.Rating;
                     movieToUpdate.ProducerId = movie.ProducerId;
 
-                    // Update genres
+                 
                     movieToUpdate.Genres.Clear();
                     var newGenres = await _context.Genres.Where(g => selectedGenres.Contains(g.Id)).ToListAsync();
                     foreach (var genre in newGenres)
@@ -198,32 +198,16 @@ namespace Lab5Cuong.Controllers
                         movieToUpdate.Genres.Add(genre);
                     }
 
-                    // ...
-
-                    var updatedMembers = movie.Members
-    .Where(m => m != null)
-    .GroupBy(x => new { x.MovieRole, x.PersonId, x.MovieId })
-    .Select(g => g.First())
-    .ToList();
-
-                    // Remove old members
-                    var existingMemberIds = movieToUpdate.Members.Select(m => m.PersonId).ToList();
-                    movieToUpdate.Members.RemoveAll(m => !updatedMembers.Select(mm => mm.PersonId).Contains(m.PersonId));
+                    movieToUpdate.Members.Clear();
 
                     foreach (var member in movie.Members)
                     {
-                        var existingMember = await _context.Members
-                            .FirstOrDefaultAsync(m => m.PersonId == member.PersonId && m.MovieId == movie.Id);
-
-                        if (existingMember == null)
+                        movieToUpdate.Members.Add(new Member
                         {
-                            _context.Entry(member).State = EntityState.Added;
-                        }
-                        else
-                        {
-                            existingMember.MovieRole = member.MovieRole;
-                            _context.Entry(existingMember).State = EntityState.Modified;
-                        }
+                            PersonId = member.PersonId,
+                            MovieId = movie.Id,
+                            MovieRole = member.MovieRole
+                        });
                     }
 
                     _context.Update(movieToUpdate);

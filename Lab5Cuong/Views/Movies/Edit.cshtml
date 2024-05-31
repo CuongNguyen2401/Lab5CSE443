@@ -58,37 +58,33 @@
             <div class="form-group">
                 <label asp-for="Members" class="control-label"></label>
                 <div class="members">
-        
-                    
-                        @foreach (var member in Model.Members)
+
+                    @for (var i = 0; i < Model.Members.Count; i++)
                         {
                             <div class="row">
                                 <div class="col-md-4">
                                     @{
                                         List<Person> people = ViewBag.People;
-                                        var options = new SelectList(people, nameof(Person.Id), nameof(Person.FirstName), member.PersonId);
-                                        var roles = Html.GetEnumSelectList<Lab5Cuong.Models.Role>();
+                                    var options = new SelectList(people, nameof(Person.Id), nameof(Person.FirstName),Model.Members[i].PersonId);
+                                        var roles = Html.GetEnumSelectList<Role>();
                                     }
-                                    <select asp-for="@member.PersonId" asp-items="options" class="form-control">
+                                <select asp-for="Members[i].PersonId" asp-items="options" class="form-control">
                                         <option value="">Select a person</option>
                                     </select>
-                                    <span asp-validation-for="@member.PersonId" class="text-danger"></span>
+                                <span asp-validation-for="Members[i].PersonId" class="text-danger"></span>
                                 </div>
                                 <div class="col-md-4">
-                                    <select asp-for="@member.MovieRole" asp-items="roles" class="form-control">
+                                <select asp-for="Members[i].MovieRole" asp-items="roles" class="form-control">
                                         <option value="">Select a role</option>
                                     </select>
-                                    <span asp-validation-for="@member.MovieRole" class="text-danger"></span>
+                                <span asp-validation-for="Members[i].MovieRole" class="text-danger"></span>
                                 </div>
                                 <div class="col-md-4">
                                     <button class="add-button" type="button">Add</button>
-                                    
                                     <button class="remove-button" type="button">Remove</button>
                                 </div>
                             </div>
-                        }
-                      
-                    
+                        }       
                 </div>
             </div>
 
@@ -125,7 +121,7 @@
                 updateMemberIndex();
                 var form = $("form");
                 $("form").removeData("validator")
-                    .removeData("unobtrusiveValidation"); // Added by jQuery Unobtrusive Validation
+                    .removeData("unobtrusiveValidation"); 
                 $.validator.unobtrusive.parse(form);
             });
 
