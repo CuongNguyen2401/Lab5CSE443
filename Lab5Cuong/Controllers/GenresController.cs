@@ -24,7 +24,15 @@ namespace Lab5Cuong.Controllers
         {
             return View(await _context.Genres.ToListAsync());
         }
-      
+        public async Task<IActionResult> MovieByGenre(int id)
+        {
+            var movies = await _context.Movie
+                                        .Include(m => m.Genres)
+                                        .Where(m => m.Genres.Any(g => g.Id == id))
+                                        .ToListAsync();
+
+            return View(movies);
+        }
 
         // GET: Genres/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -118,6 +126,7 @@ namespace Lab5Cuong.Controllers
             }
             return View(genre);
         }
+
 
         // GET: Genres/Delete/5
         public async Task<IActionResult> Delete(int? id)

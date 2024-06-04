@@ -1,0 +1,17 @@
+﻿@model List<Lab5Cuong.Models.Genre>
+
+@if (Model != null)
+{
+    <ul class="navbar-nav flex-grow-1">
+        @foreach (var genre in Model)
+        {
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-area="" asp-controller="Genres" asp-action="MovieByGenre" asp-route-id="@genre.Id">@genre.Name</a>
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <p>No genres available.</p>
+}

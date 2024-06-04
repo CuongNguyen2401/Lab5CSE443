@@ -1,0 +1,30 @@
+﻿@model IEnumerable<Movie>
+@{
+    ViewData["Title"] = "Movies by Genre";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Release Date</th>
+            <th>Rating</th>
+            <th>Price</th>
+            <th>Producer</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var movie in Model)
+        {
+            <tr>
+                <td>@movie.Title</td>
+                <td>@movie.ReleaseDate.ToShortDateString()</td>
+                <td>@movie.Rating</td>
+                <td>@movie.Price</td>
+                <td>@movie.ProducerId</td>
+            </tr>
+        }
+    </tbody>
+</table>

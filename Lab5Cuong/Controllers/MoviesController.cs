@@ -34,7 +34,7 @@ namespace Lab5Cuong.Controllers
             }
 
             var movie = await _context.Movie
-                .Include(m => m.Genres)  // Include the related Genres
+                .Include(m => m.Genres)  
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (movie == null)
@@ -77,7 +77,7 @@ namespace Lab5Cuong.Controllers
                     movie.Genres.Add(genre);
                 }
 
-              
+
                 movie.Members = movie.Members.DistinctBy(x => new { x.MovieRole, x.PersonId }).ToList();
 
                 foreach (var member in movie.Members)
@@ -129,7 +129,7 @@ namespace Lab5Cuong.Controllers
             var movie = await _context.Movie
                 .Include(m => m.Genres)
                 .Include(m => m.Members)
-                .ThenInclude(mm => mm.Person)  
+                .ThenInclude(mm => mm.Person)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (movie == null)
@@ -190,7 +190,7 @@ namespace Lab5Cuong.Controllers
                     movieToUpdate.Rating = movie.Rating;
                     movieToUpdate.ProducerId = movie.ProducerId;
 
-                 
+
                     movieToUpdate.Genres.Clear();
                     var newGenres = await _context.Genres.Where(g => selectedGenres.Contains(g.Id)).ToListAsync();
                     foreach (var genre in newGenres)
@@ -198,6 +198,7 @@ namespace Lab5Cuong.Controllers
                         movieToUpdate.Genres.Add(genre);
                     }
 
+                    //movie.Members = movie.Members.DistinctBy(x => new { x.MovieRole, x.PersonId }).ToList();
                     movieToUpdate.Members.Clear();
 
                     foreach (var member in movie.Members)

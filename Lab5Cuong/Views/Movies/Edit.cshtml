@@ -114,14 +114,13 @@
                 var count = $(".members .row").length;
                 var row = $(this).closest(".row").clone(true);
 
-
                 row.find('input, select').val('');
 
                 $(".members").append(row);
                 updateMemberIndex();
                 var form = $("form");
                 $("form").removeData("validator")
-                    .removeData("unobtrusiveValidation"); 
+                    .removeData("unobtrusiveValidation");
                 $.validator.unobtrusive.parse(form);
             });
 
@@ -132,19 +131,31 @@
                     updateMemberIndex();
                 }
             });
-        });
 
-        function updateMemberIndex() {
-            var members = $(".members .row");
-            members.each(function (index) {
-                var row = $(this);
-                row.find("select").eq(0).attr("name", `Members[${index}].PersonId`)
-                    .attr("id", `Members_${index}__PersonId`);
-                row.find("select").eq(1).attr("name", `Members[${index}].MovieRole`)
-                    .attr("id", `Members_${index}__MovieRole`);
-                row.find("span").eq(0).attr("data-valmsg-for", `Members[${index}].PersonId`);
-                row.find("span").eq(1).attr("data-valmsg-for", `Members[${index}].MovieRole`);
-            });
-        }
+            updateRemoveButtonVisibility();
+
+            function updateRemoveButtonState() {
+                var rows = $(".members .row");
+                rows.each(function (index) {
+                    var removeButton = $(this).find(".remove-button");
+                    removeButton.prop("disabled", index === rows.length - 1); // Disable the remove button for the last row
+                });
+            }
+
+            function updateMemberIndex() {
+                var members = $(".members .row");
+                members.each(function (index) {
+                    var row = $(this);
+                    row.find("select").eq(0).attr("name", `Members[${index}].PersonId`)
+                        .attr("id", `Members_${index}__PersonId`);
+                    row.find("select").eq(1).attr("name", `Members[${index}].MovieRole`)
+                        .attr("id", `Members_${index}__MovieRole`);
+                    row.find("span").eq(0).attr("data-valmsg-for", `Members[${index}].PersonId`);
+                    row.find("span").eq(1).attr("data-valmsg-for", `Members[${index}].MovieRole`);
+                });
+
+                updateRemoveButtonVisibility();
+            }
+        });
     </script>
 }

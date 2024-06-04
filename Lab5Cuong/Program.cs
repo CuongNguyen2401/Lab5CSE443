@@ -11,9 +11,9 @@ namespace Lab5Cuong
             builder.Services.AddDbContext<Lab5CuongContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("Lab5CuongContext") ?? throw new InvalidOperationException("Connection string 'Lab5CuongContext' not found.")));
 
-
-            
-            builder.Services.AddControllersWithViews();
+            // Add the following line to invoke the "GenreMovie" component asynchronously
+            builder.Services.AddRazorPages();
+            builder.Services.AddServerSideBlazor();
 
             var app = builder.Build();
 

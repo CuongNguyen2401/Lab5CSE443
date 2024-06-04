@@ -29,7 +29,12 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Movies" asp-action="Index">Movie</a>
                         </li>
+
                     </ul>
+                    <div>
+                        @await Component.InvokeAsync("GenreMenu")
+                    </div>
+
                 </div>
             </div>
         </nav>
