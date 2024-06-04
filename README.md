@@ -1,1 +1,1 @@
-This is a bakc end for e-commerce website
+This is a back-end for e-commerce website
